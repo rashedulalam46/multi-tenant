@@ -1,0 +1,520 @@
+﻿USE [Tenant]
+GO
+/****** Object:  Table [dbo].[Companies]    Script Date: 7/4/2021 12:13:08 AM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[Companies](
+	[ComCode] [nvarchar](10) NOT NULL,
+	[SubDomain] [nvarchar](50) NULL,
+	[ComName] [nvarchar](200) NULL,
+	[Phone] [nvarchar](20) NULL,
+	[Mobile] [nvarchar](20) NULL,
+	[Email] [nvarchar](100) NULL,
+	[Web] [nvarchar](50) NULL,
+	[LandmarkName] [nvarchar](100) NULL,
+	[StreetNo] [nvarchar](50) NULL,
+	[StreetName] [nvarchar](50) NULL,
+	[AptSuit] [nvarchar](50) NULL,
+	[City] [nvarchar](50) NULL,
+	[State] [nvarchar](50) NULL,
+	[Country] [char](2) NULL,
+	[Zip] [nvarchar](50) NULL,
+	[ThemeColor] [nvarchar](50) NULL,
+	[StatusCode] [char](3) NOT NULL,
+	[InsertDate] [datetime] NULL,
+	[InsertedBy] [nvarchar](50) NULL,
+ CONSTRAINT [PK_Companies] PRIMARY KEY CLUSTERED 
+(
+	[ComCode] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+) ON [PRIMARY]
+GO
+/****** Object:  Table [dbo].[TenantUsers]    Script Date: 7/4/2021 12:13:08 AM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[TenantUsers](
+	[ComCode] [nvarchar](10) NOT NULL,
+	[UserId] [nvarchar](50) NOT NULL,
+	[UserName] [nvarchar](50) NULL,
+	[Email] [nvarchar](150) NOT NULL,
+	[RoleId] [int] NULL,
+	[StatusCode] [char](3) NULL,
+ CONSTRAINT [PK_TenantUsers] PRIMARY KEY CLUSTERED 
+(
+	[ComCode] ASC,
+	[UserId] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+) ON [PRIMARY]
+GO
+INSERT [dbo].[Companies] ([ComCode], [SubDomain], [ComName], [Phone], [Mobile], [Email], [Web], [LandmarkName], [StreetNo], [StreetName], [AptSuit], [City], [State], [Country], [Zip], [ThemeColor], [StatusCode], [InsertDate], [InsertedBy]) VALUES (N'D001', N'demo', N'Demo', N'Company', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, N'ACT', NULL, NULL)
+GO
+INSERT [dbo].[Companies] ([ComCode], [SubDomain], [ComName], [Phone], [Mobile], [Email], [Web], [LandmarkName], [StreetNo], [StreetName], [AptSuit], [City], [State], [Country], [Zip], [ThemeColor], [StatusCode], [InsertDate], [InsertedBy]) VALUES (N'T001', N'test', N'Test', N'Compnay', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, N'ACT', NULL, NULL)
+GO
+INSERT [dbo].[TenantUsers] ([ComCode], [UserId], [UserName], [Email], [RoleId], [StatusCode]) VALUES (N'D001', N'admin', NULL, N'admin@demo.com', 1, N'ACT')
+GO
+INSERT [dbo].[TenantUsers] ([ComCode], [UserId], [UserName], [Email], [RoleId], [StatusCode]) VALUES (N'T001', N'admin', NULL, N'admin@test.com', 1, N'ACT')
+GO
+/****** Object:  StoredProcedure [dbo].[CheckSubDomain]    Script Date: 7/4/2021 12:13:08 AM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+-- =============================================
+-- Author:		Rashed
+-- Create date: May 6, 2021
+-- Description:	Check valid Sub Domain
+
+-- EXEC	 [dbo].[CheckSubDomain] N'demo'
+
+
+-- =============================================
+CREATE PROCEDURE [dbo].[CheckSubDomain]
+	 @SubDomain nvarchar(150)	
+AS
+BEGIN
+	
+	SET NOCOUNT ON;	
+	DECLARE @sql1 NVARChAR(MAX)=''
+	DECLARE @sql2 NVARChAR(MAX)=''
+
+	SET @sql1 = '
+	DECLARE @Com_Code nvarchar(50)=NULL
+	DECLARE @Status_Code CHAR(3)=''N''
+	DECLARE @IntUserID nvarchar(50)  	 
+	DECLARE @Sub_Domain nvarchar(50)=''''
+	DECLARE @Com_Logo nvarchar(50)=''''
+	DECLARE @Theme_Color NVARCHAR(50)
+	DECLARE @Msg nvarchar(50)=''Invalid Email!!''	
+	DECLARE @Success char(1)=''N''
+	
+	SELECT        
+		@Com_Code		= ComCode, 
+		@Status_Code	= StatusCode,
+		@Sub_Domain		= SubDomain
+	FROM    Companies 
+	WHERE        (SubDomain = '''+@SubDomain+''') AND (StatusCode = ''ACT'')
+
+	IF (@Status_Code = ''ACT'')
+	BEGIN
+		SET @Success = ''Y''	
+		SET @Msg = ''Ok''
+
+		SELECT  
+			@Theme_Color = ThemeColor,
+			@Com_Logo = Logo
+		FROM Tenant'+@SubDomain+'.dbo.Companies
+	END
+	ELSE
+	BEGIN
+		SET @Success = ''N''
+		IF(@Status_Code = ''INA'')
+		BEGIN
+			SET @Msg = ''Your account is In-active.''
+		END
+		ELSE
+		BEGIN
+			SET @Msg = ''Your account is lock.''
+		END
+	END
+	'	
+	
+
+	SET @sql2= '
+
+	SELECT 
+		@Success AS Success,
+		@Msg As Msg,
+		@Com_Code As ComCode,
+		@Sub_Domain As SubDomain,
+		@Theme_Color As ThemeColor,
+		@Com_Logo As Logo
+		'
+		--PRINT(@sql1 + @sql2)
+		EXECUTE (@sql1 + @sql2) 
+
+
+END
+GO
+/****** Object:  StoredProcedure [dbo].[SignIn]    Script Date: 7/4/2021 12:13:08 AM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+-- =============================================
+-- Author:		Rashed
+-- Create date: June 15, 2021
+-- Description:	Signin
+
+-- EXEC	 [dbo].[SignIn] N'admin@test.com'
+-- =============================================
+CREATE PROCEDURE [dbo].[SignIn]
+	 @UserName nvarchar(200)	
+AS
+BEGIN
+	
+	SET NOCOUNT ON;	
+	DECLARE @sql1 NVARChAR(MAX)=''
+	DECLARE @sql2 NVARChAR(MAX)=''
+
+	
+	DECLARE @Com_Code nvarchar(50) = ''
+	DECLARE @Status_Code CHAR(3) = 'NAN' 
+	DECLARE @Sub_Domain nvarchar(50) = 'rc'
+	
+
+	
+	
+	SELECT        
+		@Com_Code		= ISNULL(C.ComCode,''), 
+		@Status_Code	= ISNULL(U.StatusCode,'NAN'),
+		@Sub_Domain		= ISNULL(C.SubDomain,'')
+	FROM        TenantUsers As U INNER JOIN
+                Companies As C ON U.ComCode = C.ComCode
+	WHERE        (U.Email = @UserName)
+	
+	SET @sql1 = '
+	DECLARE @Com_Logo nvarchar(50) = ''''
+	DECLARE @Theme_Color NVARCHAR(50) = ''''
+	DECLARE @Msg nvarchar(50) = ''Invalid Email or Password!!''	
+	DECLARE @Success char(1) = ''N''
+
+	IF ('''+@Status_Code+''' = ''ACT'')
+	BEGIN
+		SET @Success = ''Y''	
+		SET @Msg = ''Ok''
+
+		SELECT  
+			@Theme_Color = ThemeColor,
+			@Com_Logo = Logo
+		FROM Tenant'+@Sub_Domain+'.dbo.Companies
+	END
+	ELSE
+	BEGIN
+		SET @Success = ''N''
+		IF('''+@Status_Code+''' = ''INA'')
+		BEGIN
+			SET @Msg = ''Your account is In-active.''
+		END
+		ELSE
+		BEGIN
+			SET @Msg = ''Your account is lock.''
+		END
+	END
+	'
+		
+	
+
+	SET @sql2= '
+	SELECT 
+		@Success AS Success,
+		@Msg As Msg,
+		'''+@Com_Code+''' As ComCode,
+		'''+@Sub_Domain+''' As SubDomain,
+		@Theme_Color As ThemeColor,
+		@Com_Logo As Logo
+		'
+	--PRINT(@sql1 + @sql2)
+	EXECUTE (@sql1 + @sql2) 
+
+
+END
+GO
+
+
+
+
+
+USE [TenantDemo]
+GO
+/****** Object:  Table [dbo].[AppUsers]    Script Date: 7/4/2021 12:13:36 AM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[AppUsers](
+	[UserId] [nvarchar](50) NOT NULL,
+	[FirstName] [nvarchar](50) NULL,
+	[LastName] [nvarchar](50) NULL,
+	[Email] [nvarchar](150) NOT NULL,
+	[Pass] [nvarchar](50) NULL,
+	[StatusCode] [char](3) NULL,
+ CONSTRAINT [PK_AppUsers] PRIMARY KEY CLUSTERED 
+(
+	[UserId] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+) ON [PRIMARY]
+GO
+/****** Object:  Table [dbo].[Companies]    Script Date: 7/4/2021 12:13:36 AM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[Companies](
+	[ComCode] [nvarchar](10) NOT NULL,
+	[SubDomain] [nvarchar](50) NULL,
+	[ComName] [nvarchar](200) NULL,
+	[Phone] [nvarchar](20) NULL,
+	[Mobile] [nvarchar](20) NULL,
+	[Email] [nvarchar](100) NULL,
+	[Web] [nvarchar](50) NULL,
+	[LandmarkName] [nvarchar](100) NULL,
+	[StreetNo] [nvarchar](50) NULL,
+	[StreetName] [nvarchar](50) NULL,
+	[AptSuit] [nvarchar](50) NULL,
+	[City] [nvarchar](50) NULL,
+	[State] [nvarchar](50) NULL,
+	[Country] [char](2) NULL,
+	[Zip] [nvarchar](50) NULL,
+	[ThemeColor] [nvarchar](50) NULL,
+	[Logo] [nvarchar](50) NULL,
+	[StatusCode] [char](3) NOT NULL,
+	[InsertDate] [datetime] NULL,
+	[InsertedBy] [nvarchar](50) NULL,
+ CONSTRAINT [PK_Companies] PRIMARY KEY CLUSTERED 
+(
+	[ComCode] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+) ON [PRIMARY]
+GO
+INSERT [dbo].[AppUsers] ([UserId], [FirstName], [LastName], [Email], [Pass], [StatusCode]) VALUES (N'ADMIN', N'Admin', N'User', N'admin@demo.com', N'123456', N'ACT')
+GO
+INSERT [dbo].[Companies] ([ComCode], [SubDomain], [ComName], [Phone], [Mobile], [Email], [Web], [LandmarkName], [StreetNo], [StreetName], [AptSuit], [City], [State], [Country], [Zip], [ThemeColor], [Logo], [StatusCode], [InsertDate], [InsertedBy]) VALUES (N'D001', N'demo', N'Demo Company', N'+44 7911 123456', N'+44 7911 123456', N'info@demo.com', N'www.demo.com', N'Prime Minister', N'10', N'Downing Street', NULL, N'London', N'London', N'UK', N'1232', NULL, N'demo-logo.png', N'ACT', NULL, NULL)
+GO
+/****** Object:  StoredProcedure [dbo].[SignIn]    Script Date: 7/4/2021 12:13:36 AM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+-- =============================================
+-- Author:		Rashed
+-- Create date: June 15, 2021
+-- Description:	Signin
+
+-- EXEC	 [dbo].[SignIn] N'admin@demo.com', N'123456'
+
+-- =============================================
+CREATE PROCEDURE [dbo].[SignIn]
+	 @UserName nvarchar(150)
+	,@Password nvarchar(50)
+
+AS
+BEGIN
+	
+	SET NOCOUNT ON;	
+	
+	DECLARE @User_ID nvarchar(50)=NULL
+	DECLARE @Role_ID int = 0
+	DECLARE @Status_Code CHAR(3)='N'
+	DECLARE @User_Name nvarchar(150)
+	DECLARE @DelegateID nvarchar(50)
+	DECLARE @IntUserID nvarchar(50)  	 
+	DECLARE @Account_Code nvarchar(50)=''
+	declare @Msg nvarchar(50)='Invalid Email or Password!!'	
+	declare @Success char(1)='N'
+	DECLARE @MyOffset nvarchar(50)='0'
+	DECLARE @MyCity nvarchar(50)=''
+	DECLARE @Pro_Pic nvarchar(100)=''
+	
+
+
+
+	--01 Internal User
+	SELECT      @IntUserID=UserId,
+					@User_Name		= FirstName + ' ' + ISNULL(LastName,''),
+					@Status_Code	= StatusCode
+	FROM            AppUsers
+	WHERE        (Email = @UserName) 		
+	IF(@IntUserID IS NOT NULL) 
+	BEGIN		
+		SET @User_ID = @IntUserID
+		SET @Role_ID = 1			
+		IF (@Status_Code = 'ACT')	
+		BEGIN	
+			IF EXISTS ( SELECT UserId FROM AppUsers WHERE (Email = @UserName) AND (pass = @Password))
+			BEGIN
+				SET @Success = 'Y'	
+				SET @Msg = 'Ok'		
+			END
+			ELSE
+			BEGIN
+				SET @Success = 'W'
+			END
+		END
+		ELSE
+		BEGIN
+			SET @Success = 'N'
+			IF(@Status_Code = 'INA')
+			BEGIN
+				SET @Msg = 'Your account is In-active.'
+				SET @User_Name=''
+			END
+			ELSE
+			BEGIN
+				SET @Msg = 'Your account is lock.'
+				SET @User_Name='PRST'
+			END
+		END
+	END	
+						
+	
+
+
+	SELECT 
+		ISNULL(@User_ID,'') As  UserID,
+		@User_Name As  UserName,
+		@Role_ID As RoleID,		
+		@Msg As Msg,
+		@Success AS Success
+
+END
+GO
+
+
+USE [TenantTest]
+GO
+/****** Object:  Table [dbo].[AppUsers]    Script Date: 7/4/2021 12:14:06 AM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[AppUsers](
+	[UserId] [nvarchar](50) NOT NULL,
+	[FirstName] [nvarchar](50) NULL,
+	[LastName] [nvarchar](50) NULL,
+	[Email] [nvarchar](150) NOT NULL,
+	[Pass] [nvarchar](50) NULL,
+	[StatusCode] [char](3) NULL,
+ CONSTRAINT [PK_AppUsers] PRIMARY KEY CLUSTERED 
+(
+	[UserId] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+) ON [PRIMARY]
+GO
+/****** Object:  Table [dbo].[Companies]    Script Date: 7/4/2021 12:14:06 AM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[Companies](
+	[ComCode] [nvarchar](10) NOT NULL,
+	[SubDomain] [nvarchar](50) NULL,
+	[ComName] [nvarchar](200) NULL,
+	[Phone] [nvarchar](20) NULL,
+	[Mobile] [nvarchar](20) NULL,
+	[Email] [nvarchar](100) NULL,
+	[Web] [nvarchar](50) NULL,
+	[LandmarkName] [nvarchar](100) NULL,
+	[StreetNo] [nvarchar](50) NULL,
+	[StreetName] [nvarchar](50) NULL,
+	[AptSuit] [nvarchar](50) NULL,
+	[City] [nvarchar](50) NULL,
+	[State] [nvarchar](50) NULL,
+	[Country] [char](2) NULL,
+	[Zip] [nvarchar](50) NULL,
+	[ThemeColor] [nvarchar](50) NULL,
+	[Logo] [nvarchar](50) NULL,
+	[StatusCode] [char](3) NOT NULL,
+	[InsertDate] [datetime] NULL,
+	[InsertedBy] [nvarchar](50) NULL,
+ CONSTRAINT [PK_Companies] PRIMARY KEY CLUSTERED 
+(
+	[ComCode] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+) ON [PRIMARY]
+GO
+INSERT [dbo].[AppUsers] ([UserId], [FirstName], [LastName], [Email], [Pass], [StatusCode]) VALUES (N'ADMIN', N'Admin', N'User', N'admin@test.com', N'123456', N'ACT')
+GO
+INSERT [dbo].[Companies] ([ComCode], [SubDomain], [ComName], [Phone], [Mobile], [Email], [Web], [LandmarkName], [StreetNo], [StreetName], [AptSuit], [City], [State], [Country], [Zip], [ThemeColor], [Logo], [StatusCode], [InsertDate], [InsertedBy]) VALUES (N'T001', N'test', N'Test Compnay', N'+1 7911 123456', N'+1 7911 123456', N'info@test.com', N'www.test.com', NULL, N'1', N'Main Street', NULL, N'Dallas', N'TX', N'US', N'123', N'12qwew', N'test-logo.png', N'ACT', NULL, NULL)
+GO
+/****** Object:  StoredProcedure [dbo].[SignIn]    Script Date: 7/4/2021 12:14:06 AM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+-- =============================================
+-- Author:		Rashed
+-- Create date: June 15, 2021
+-- Description:	Signin
+
+-- EXEC	 [dbo].[SignIn] N'admin@test.com', N'123456'
+
+-- =============================================
+CREATE PROCEDURE [dbo].[SignIn]
+	 @UserName nvarchar(150)
+	,@Password nvarchar(50)
+
+AS
+BEGIN
+	
+	SET NOCOUNT ON;	
+	
+	DECLARE @User_ID nvarchar(50)=NULL
+	DECLARE @Role_ID int = 0
+	DECLARE @Status_Code CHAR(3)='N'
+	DECLARE @User_Name nvarchar(150)
+	DECLARE @DelegateID nvarchar(50)
+	DECLARE @IntUserID nvarchar(50)  	 
+	DECLARE @Account_Code nvarchar(50)=''
+	declare @Msg nvarchar(50)='Invalid Email or Password!!'	
+	declare @Success char(1)='N'
+	DECLARE @MyOffset nvarchar(50)='0'
+	DECLARE @MyCity nvarchar(50)=''
+	DECLARE @Pro_Pic nvarchar(100)=''
+	
+
+
+
+	--01 Internal User
+	SELECT      @IntUserID=UserId,
+					@User_Name		= FirstName + ' ' + ISNULL(LastName,''),
+					@Status_Code	= StatusCode
+	FROM            AppUsers
+	WHERE        (Email = @UserName) 		
+	IF(@IntUserID IS NOT NULL) 
+	BEGIN		
+		SET @User_ID = @IntUserID
+		SET @Role_ID = 1			
+		IF (@Status_Code = 'ACT')	
+		BEGIN	
+			IF EXISTS ( SELECT UserId FROM AppUsers WHERE (Email = @UserName) AND (pass = @Password))
+			BEGIN
+				SET @Success = 'Y'	
+				SET @Msg = 'Ok'			
+			END
+			ELSE
+			BEGIN
+				SET @Success = 'W'
+			END
+		END
+		ELSE
+		BEGIN
+			SET @Success = 'N'
+			IF(@Status_Code = 'INA')
+			BEGIN
+				SET @Msg = 'Your account is In-active.'
+				SET @User_Name=''
+			END
+			ELSE
+			BEGIN
+				SET @Msg = 'Your account is lock.'
+				SET @User_Name='PRST'
+			END
+		END
+	END	
+						
+	
+
+
+	SELECT 
+		ISNULL(@User_ID,'') As  UserID,
+		@User_Name As  UserName,
+		@Role_ID As RoleID,		
+		@Msg As Msg,
+		@Success AS Success
+
+END
+GO
