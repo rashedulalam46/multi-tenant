@@ -1,0 +1,40 @@
+﻿@model SigninViewModel
+@using Microsoft.AspNetCore.Http
+
+@{ 
+    var company_LogoPath = "/files/" + Model.SubDomain + "/com/" + Model.Logo;
+}
+<div id="frmSignin">
+    <a class="ss-dashboard-logo margin-bottom-20" href="/login" title="Home">
+        <img src="@company_LogoPath" width="80" height="50">
+    </a>
+    <h1 class="ss-title-1 ss-semibold text-uppercase">Login</h1>
+    <div class="form-group ss-form margin-top-50">
+        <label>User Name</label>
+        <input type="text" asp-for="UserName" class="form-control ss-login-input req" maxlength="100" tabindex="1" spellcheck="false" autocapitalize="off" badinput="false" readonly />
+        <span asp-validation-for="UserName" class="text-danger"></span>
+    </div>
+    <div class="form-group ss-form position-relative margin-top-30">
+        <span style="display: flex;justify-content: space-between;">
+            <label>Password</label>
+            <a id="btnForgetPassword" class="ss-link text-muted" href="javascript:void(0)">Forgot Password?</a>
+        </span>
+        <a class="togglePwd" href="javascript:void(0)"><i class="ss-view"></i></a>
+        <input asp-for="Password" type="password" class="form-control ss-login-input req" maxlength="20" tabindex="2" AutoCompleteType="Disabled" autocomplete="" spellcheck="false" badinput="false" />
+        <span asp-validation-for="Password" class="text-danger"></span>
+       
+    </div>
+    <div class="form-group margin-top-20">
+        <div class="row">
+            <div class="col-sm-12 col-md-6 col-lg-6">
+                <button id="btnBack" type="button" class="btn btn-secondary btn-lg btn-block" tabindex="4" title="Login">Back</button>
+            </div>
+            <div class="col-sm-12 col-md-6 col-lg-6">
+                <button id="btnLogin" type="button" class="btn btn-primary btn-lg btn-block" tabindex="4" title="Login">Login</button>
+            </div>
+            <div class="col-sm-12 col-md-12 col-lg-12  text-right">
+                <p id="msg" class="ss-bold"></p>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,93 @@
+﻿@model SigninViewModel
+@using Microsoft.AspNetCore.Http
+
+
+@{
+    Layout = null;
+    ViewData["Title"] = "Login";
+    var company_LogoPath = "/files/" + Model.SubDomain + "/com/" + Model.Logo;
+}
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv='cache-control' content='no-cache, no-store, must-revalidate'>
+    <meta http-equiv='expires' content='0'>
+    <meta http-equiv='pragma' content='no-cache'>
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link rel="apple-touch-icon" sizes="57x57" href="~/img/favicon/apple-icon-57x57.png">
+    <link rel="apple-touch-icon" sizes="60x60" href="~/img/favicon/apple-icon-60x60.png">
+    <link rel="apple-touch-icon" sizes="72x72" href="~/img/favicon/apple-icon-72x72.png">
+    <link rel="apple-touch-icon" sizes="76x76" href="~/img/favicon/apple-icon-76x76.png">
+    <link rel="apple-touch-icon" sizes="114x114" href="~/img/favicon/apple-icon-114x114.png">
+    <link rel="apple-touch-icon" sizes="120x120" href="~/img/favicon/apple-icon-120x120.png">
+    <link rel="apple-touch-icon" sizes="144x144" href="~/img/favicon/apple-icon-144x144.png">
+    <link rel="apple-touch-icon" sizes="152x152" href="~/img/favicon/apple-icon-152x152.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="~/img/favicon/apple-icon-180x180.png">
+    <link rel="icon" type="image/png" sizes="192x192" href="~/img/favicon/android-icon-192x192.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="~/img/favicon/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="96x96" href="~/img/favicon/favicon-96x96.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="~/img/favicon/favicon-16x16.png">
+    <meta name="msapplication-TileImage" content="~/img/favicon/ms-icon-144x144.png">
+
+    <title>Login</title>
+
+    <environment include="Development">
+        <link href="~/css/site.css" rel="stylesheet" asp-append-version="true" />
+        <link href="~/lib/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet" />
+    </environment>
+    <environment exclude="Development">
+        <link href="~/css/site.css" rel="stylesheet" asp-append-version="true" />
+        <link href="~/lib/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet" />
+    </environment>
+    <style type="text/css">
+        body {
+            padding-top: 0px;
+        }
+    </style>
+</head>
+<body id="baseInfo" data-signupfor="" class="">
+    <div class="container">
+        <main role="main" class="pb-3">
+            @if (string.IsNullOrWhiteSpace(Model.UserName))
+            {
+                <div id="dvLoginPre">                      
+                    <partial name="_LoginPre" model="Model.LoginViewModel" />
+                </div>
+            }
+            else
+            {
+                <div id="dvLoginPost">
+                    <partial name="_LoginPost" model="Model" />
+                </div>
+            }
+        </main>
+    </div>
+    <footer class="border-top footer text-muted">
+        <input id="Lat" type="hidden" />
+        <input id="Lng" type="hidden" />
+        <input id="Technology" type="hidden" />
+        <div class="container">
+            &copy; 2021 - MultiTenant - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+        </div>
+    </footer>
+    <environment include="Development">
+        <script src="~/lib/jquery/dist/jquery.min.js"></script>
+        <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+        <script src="~/js/site.min.js" asp-append-version="true"></script>
+        <script src="~/js/login.js" asp-append-version="true"></script>
+    </environment>
+    <environment exclude="Development">
+        <script src="~/lib/jquery/dist/jquery.min.js"></script>
+        <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+        <script src="~/js/site.min.js" asp-append-version="true"></script>
+        <script src="~/js/login.js" asp-append-version="true"></script>
+    </environment>
+    @await Html.PartialAsync("_ValidationScriptsPartial")
+</body>
+   
+</html>
+
+
+

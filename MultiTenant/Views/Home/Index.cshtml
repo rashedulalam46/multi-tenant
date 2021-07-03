@@ -1,0 +1,15 @@
+﻿@model Companies
+@{
+    ViewData["Title"] = "Home Page";
+}
+
+<div class="text-left">
+    <address>
+        Company: @Model.ComName<br>
+        Phone: @Model.Phone<br>
+        Email: @Model.Email<br>
+        Web: @Model.Web<br>
+        @Model.StreetNo @Model.StreetName, @Model.City<br>
+        @Model.Country
+    </address>
+</div>

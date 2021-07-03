@@ -1,0 +1,40 @@
+﻿@model LoginViewModel
+@using Microsoft.AspNetCore.Http
+@{
+    var company_LogoPath = "/files/" + Model.SubDomain + "/com/" + Model.Logo;
+    //var company_LogoPath = "";
+}
+
+<div id="frmSignin">
+    <a class="margin-bottom-20" href="" title="Home">
+        <img src="@company_LogoPath" width="80" height="50">
+    </a>
+    <h1 class="text-uppercase">Login</h1>
+    <div class="form-group margin-top-50">
+        <label>Email</label>
+        <input type="text" asp-for="UserName" class="form-control req text-r" maxlength="100" tabindex="1" spellcheck="false" AutoCompleteType="Disabled" autocomplete="off" autocapitalize="off" badinput="false" />
+        <span asp-validation-for="UserName" class="text-danger"></span>
+    </div>
+    <div class="form-group margin-top-15">
+        <div class="row">
+            <div class="col-sm-12 col-md-12 col-lg-4">
+                <div class="form-check">
+                    <input type="checkbox" asp-for="RememberMe" class="form-check-input" tabindex="2" />
+                    <label class="form-check-label" for="RememberMe">
+                        Remember Me
+                    </label>
+                </div>
+            </div>
+            <div class="col-sm-12 col-md-12 col-lg-8 text-right">
+                <p class="text-muted">Don't have an account? <a id="openScModal" href="javascript:void(0)" class="text-muted ml-1"><b>Create account</b></a></p>
+            </div>
+        </div>
+    </div>
+    <div class="form-group margin-top-20">
+        <div class="row">            
+            <div class="col-sm-12 col-md-12 col-lg-12 loginScreen">
+                <button id="btnNext" type="button" class="btn btn-primary btn-lg btn-block" style="background-color:@Model.ThemeColor;" tabindex="3" title="Login">Next</button>
+            </div>
+        </div>
+    </div>
+</div>
