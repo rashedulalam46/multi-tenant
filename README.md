@@ -3,7 +3,7 @@ This is a simple web application using Multi-tenancy architecture. The applicati
 ## Database
 Create 3 database (Tenant, TenantDemo, and TenantTest). Run the SQL scrip from the database directory
 ## How to Run
-Download the application. Change the connection string credential of appsettings file, based on your SQL server credential. Build and run the application.
+Download the application. Change the connection string credential from the appsettings file, based on your SQL server credential. Build and run the application.
 * Demo Company
   * User Name: admin@demo.com
   * Password : 123456
