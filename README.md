@@ -4,5 +4,10 @@ This is a simple web application using Multi-tenancy architecture. The applicati
 Create 3 database (Tenant, TenantDemo, and TenantTest). Run the SQL scrip from the database directory
 ## How to Run
 Download the application and run after build. Login by using the following credential.
-* User Name: admin@test.com
-* Password: 123456
+* Demo Company
+  * User Name: admin@demo.com
+  * Password : 123456
+ * Test Company
+  * User Name: admin@test.com
+  * Password : 123456
+
