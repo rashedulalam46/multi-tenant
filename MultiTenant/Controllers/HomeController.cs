@@ -22,7 +22,6 @@ namespace MultiTenant.Controllers
             Companies company = new Companies();
             try
             {
-
                 company = _tenantDBContext.Companies.FirstOrDefault();
                 return await Task.Run(() => View(company));
             }
