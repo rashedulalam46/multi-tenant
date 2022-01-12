@@ -24,6 +24,5 @@ namespace MultiTenant.Models
         public string StatusCode { get; set; }
         public string InsertDate { get; set; }
         public string InsertedBy { get; set; }
-
     }
 }
