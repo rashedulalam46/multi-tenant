@@ -8,8 +8,7 @@ using System.Threading.Tasks;
 namespace MultiTenant.Services
 {
     public interface IAccountServices
-    {
-        //Task<SigninPre> SigninPre(string email);
+    {        
         Task<SigninPost> SigninPost(SigninViewModel signinViewModel);
     }
 

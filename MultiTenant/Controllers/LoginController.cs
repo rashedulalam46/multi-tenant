@@ -130,26 +130,18 @@ namespace MultiTenant.Controllers
                 }
                 model.LoginViewModel.SubDomain = model.SubDomain;
                 model.LoginViewModel.Logo = model.Logo;
-                //var hostingPath = Path.Combine(_webHostEnvironment.WebRootPath, "files\\" + model.SubDomain + "\\com");
-                //var existingFiles = Directory.GetFiles(hostingPath, model.ComCode + ".*");
-
-                //if (existingFiles.Length > 0)
-                //{
-                //    companyLogo = model.ComCode + Path.GetExtension(existingFiles[0]);
-                //    //companyLogoPath = "/files/" + model.SubDomain + "/com/logo/" + model.ComCode + Path.GetExtension(existingFiles[0]);
-                //}
+                
 
                 model.SignupFor = signupfor;
                 return await Task.Run(() => View(model));
             }
             catch (Exception ex)
-            {
-                //_errorLogService.WriteErrorLog(ex.ToString());
+            {               
                 return await Task.Run(() => Redirect("/Error/Index".ToLower()));
             }
         }
 
-        ///[HttpPost, ValidateAntiForgeryToken]
+       
         public async Task<IActionResult> LoginPre(LoginViewModel model)
         {
             CommonViewModel commModel = new CommonViewModel();
@@ -217,15 +209,12 @@ namespace MultiTenant.Controllers
                     var param = CryptographyService.EncodeServerName(model.UserName + "|" + loginSundomain.SubDomain + "|" + model.RememberMe);
 
                 commModel.Success = "Y";
-                commModel.ReturnValue = makingNewUrl + "/login?v=".ToLower() + param;
-                //return Redirect(returnUrl);
+                commModel.ReturnValue = makingNewUrl + "/login?v=".ToLower() + param;               
                 return await Task.Run(() => Json(commModel));
 
             }
             catch (Exception ex)
-            {
-                //_errorLogService.WriteErrorLog(ex.ToString());
-                //return await Task.Run(() => Redirect("/login".ToLower()));
+            {              
                 commModel.ReturnValue = "/login";
                 commModel.Success = "N";
                 commModel.Msg = ex.Message.ToString();
