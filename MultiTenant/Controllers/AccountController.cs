@@ -18,7 +18,6 @@ namespace MultiTenant.Controllers
             _acountServices = acountServices;
         }
 
-
         public async Task<IActionResult> Signin(SigninViewModel model)
         {
             CommonViewModel commModel = new();
