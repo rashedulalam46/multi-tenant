@@ -50,7 +50,7 @@ namespace MultiTenant.Controllers
             catch (Exception ex)
             {
                 commModel.Success = "N";
-                commModel.Msg = "Oops! Something went wrong.";
+                commModel.Msg = "Sorry, something went wrong. Please try again.";
                 commModel.ReturnValue = "/login";
             }
             return await Task.Run(() => Json(commModel));
